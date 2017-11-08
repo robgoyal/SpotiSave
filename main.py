@@ -21,18 +21,48 @@ def create_csv():
     worksheet.write('C1', 'Album Name', bold)
     worksheet.write('D1', 'Date Added', bold)
 
-    worksheet.close()
+    return worksheet, workbook
 
+
+def close_csv(workbook):
+
+    workbook.close()
 
 def main():
 
     auth_token = get_auth_token()
 
+    worksheet, workbook = create_csv()
+
     header = {'Authorization': 'Bearer {}'.format(auth_token)}
+    payload = {'limit': 50}
     url = "https://api.spotify.com/v1/me/tracks"
 
-    r = requests.get(url, headers = header)
-    print(r.text)
+
+    row = 1
+
+    while True:
+        r = requests.get(url, headers = header, params = payload)
+        # Check if status code returned 200
+        if r.status_code == 200:
+            r = r.json()
+
+            for item in r['items']:
+                worksheet.write(row, 0, item['track']['id'])
+                worksheet.write(row, 1, item['track']['name'])
+                worksheet.write(row, 3, item['added_at'])
+
+                row += 1
+
+            # Check if any songs are remaining
+            if r['next'] == None:
+                break
+            else:
+                url = r['next']
+        else:
+            print(r.text)
+
+    close_csv(workbook)
 
 if __name__=="__main__":
     main()
