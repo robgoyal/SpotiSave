@@ -1,17 +1,38 @@
 import requests
-import base64
+import configparser
+import xlsxwriter
 
-client_id = ""
-client_secret = ""
+def get_auth_token():
 
-auth_string = 'Basic ' + base64.b64encode(bytes(client_id + ':' + client_secret, 'utf-8')).decode('ascii')
+    # Retrieve authentication token
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    AUTH_TOKEN = config['KEY']['AUTH_TOKEN']
 
-# Setup access token information
-header = {'Authorization': auth_string}
-payload = {'grant_type': 'client_credentials'}
-url = 'https://accounts.spotify.com/api/token'
+    return AUTH_TOKEN
 
-# Request access token
-r = requests.post(url, data = payload, headers = header)
+def create_csv():
+    workbook = xlsxwriter.Workbook('spotifysongs.xlsx')
+    worksheet = workbook.add_worksheet()
 
-auth_token = r.json()['access_token']
+    bold = workbook.add_format({'bold': True})
+    worksheet.write('A1', 'Track ID', bold)
+    worksheet.write('B1', 'Track Name', bold)
+    worksheet.write('C1', 'Album Name', bold)
+    worksheet.write('D1', 'Date Added', bold)
+
+    worksheet.close()
+
+
+def main():
+
+    auth_token = get_auth_token()
+
+    header = {'Authorization': 'Bearer {}'.format(auth_token)}
+    url = "https://api.spotify.com/v1/me/tracks"
+
+    r = requests.get(url, headers = header)
+    print(r.text)
+
+if __name__=="__main__":
+    main()
