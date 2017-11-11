@@ -7,6 +7,7 @@ A Python script designed to export all saved songs from Spotify to an Excel file
 ### Functionality
 
 The functionality of this project will initially be completely basic:
+
     - One time run to save all songs
     - Save a certain set of headings:
         - Track ID 
