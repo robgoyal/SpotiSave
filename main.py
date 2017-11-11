@@ -1,6 +1,6 @@
 # Name: main.py
 # Author: Robin Goyal
-# Last-Modified: November 8, 2017
+# Last-Modified: November 10, 2017
 # Purpose: Retrieve basic information regarding currently saved tracks
 #          on my profile for future use
 
@@ -9,70 +9,83 @@ import configparser
 import xlsxwriter
 
 def get_auth_token():
+    '''
+    Retrieve authentication token from config file
+    '''
 
-    # Retrieve authentication token
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    AUTH_TOKEN = config['KEY']['AUTH_TOKEN']
+    pass
 
-    return AUTH_TOKEN
+def create_xlsx():
+    '''
+    Create a CSV file with proper formatting and the following headings:
+        - Track ID
+        - Track Name
+        - Artist(s)
+        - Album Name
+        - Date Added 
+        - Track URL
+        - Popularity
+    '''
 
-def create_csv():
-
-    # Initialize workbook and worksheet
-    workbook = xlsxwriter.Workbook('spotifysongs.xlsx')
-    worksheet = workbook.add_worksheet()
-
-    # Create formatter
-    bold = workbook.add_format({'bold': True})
-
-    # Declare headings for worksheet
-    worksheet.write('A1', 'Track ID', bold)
-    worksheet.write('B1', 'Track Name', bold)
-    worksheet.write('C1', 'Album Name', bold)
-    worksheet.write('D1', 'Date Added', bold)
-
-    return worksheet, workbook
+    pass
 
 
-def close_csv(workbook):
+def close_xlsx(workbook):
     '''
     workbook: workbook file created for song data
+
+    Close xlsx file after saving all data
     '''
 
-    workbook.close()
+    pass
+
+def make_request(url):
+    '''
+    url: url for spotify request
+
+    Make request for a set of songs (limit of 50) including the offset
+    '''
+
+    pass
+
+def write_row(row, track):
+    '''
+    track: track information
+    row: row to write track information to 
+
+    Write row with specific headings in xlsx file from track
+    '''
+
+    pass
 
 def main():
+    '''
+    Get all song data from the Spotify API and save to excel file
+    '''
 
     # Retrieve authentication token
     auth_token = get_auth_token()
 
     # Get worksheet and workbook pointer
-    worksheet, workbook = create_csv()
-
-    # Setup data regarding initial request
-    header = {'Authorization': 'Bearer {}'.format(auth_token)}
-    payload = {'limit': 50}
-    url = "https://api.spotify.com/v1/me/tracks"
+    worksheet, workbook = create_xlsx()
 
     # Initialize row to 1 to account for header row
     row = 1
 
+    # Iterate until all requests 
     while True:
 
         # Perform initial request
-        r = requests.get(url, headers = header, params = payload)
+        r = make_request(url)
 
-        # Check if status code returned 200
+        # Check if request was valid
         if r.status_code == 200:
-            r = r.json()
 
             # Append track information to sheet
             for item in r['items']:
-                worksheet.write(row, 0, item['track']['id'])
-                worksheet.write(row, 1, item['track']['name'])
-                worksheet.write(row, 3, item['added_at'])
 
+                # Write row with specific headers
+                write_row(row, item)
                 row += 1
 
             # Check if there are no songs remaining
@@ -80,15 +93,15 @@ def main():
                 break
 
             # Retrieve url for next request
-            else:
-                url = r['next']
+            url = r['next']
 
-        # Print error message for debugging
+        # Handle request errors
+        # Initial handler is a print debug statement
         else:
             print(r.text)
 
     # Close csv file
-    close_csv(workbook)
+    close_xlsx(workbook)
 
 if __name__=="__main__":
     main()
