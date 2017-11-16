@@ -13,7 +13,11 @@ def get_auth_token():
     Retrieve authentication token from config file
     '''
 
-    pass
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    AUTH_TOKEN = config['KEY']['AUTH_TOKEN']
+
+    return AUTH_TOKEN
 
 def create_xlsx():
     '''
@@ -58,6 +62,16 @@ def write_row(row, track):
 
     pass
 
+def handle_error(response):
+    '''
+    Print out an appropriate error message
+
+    response: Response from request
+    return: Approriate error message
+    '''
+
+    pass
+
 def main():
     '''
     Get all song data from the Spotify API and save to excel file
@@ -76,29 +90,29 @@ def main():
     while True:
 
         # Perform initial request
-        r = make_request(url)
+        response = make_request(url)
 
         # Check if request was valid
-        if r.status_code == 200:
+        if response.status_code == 200:
 
             # Append track information to sheet
-            for item in r['items']:
+            for track_info in response['items']:
 
                 # Write row with specific headers
-                write_row(row, item)
+                write_row(row, track_info)
                 row += 1
 
             # Check if there are no songs remaining
-            if r['next'] == None:
+            if response['next'] == None:
                 break
 
             # Retrieve url for next request
-            url = r['next']
+            url = response['next']
 
         # Handle request errors
         # Initial handler is a print debug statement
         else:
-            print(r.text)
+            print(response.text)
 
     # Close csv file
     close_xlsx(workbook)
