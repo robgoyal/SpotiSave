@@ -28,15 +28,23 @@ The above may be the only functionality included for the purpose of this project
 
 This project requires account creation for Spotify and obtaining an authentication token from the API console in the Spotify API. 
 
-Save the authentication token in a config.ini file with the contents:
+Steps to receive authentication token:
 
-```
-[KEY]
-AUTH_TOKEN = "your-auth-token"
-```
+    - Go to Spotify's API Console for access to tracks [here](https://developer.spotify.com/web-api/console/get-several-tracks/)
+    - Login if prompted
+    - Click the Clear Token button in the OAuth Token field
+    - Click the Get Oauth Token button
+    - Choose user-library-read as the scope and click Request Token
+    - Copy the value in the OAuth Token field
+    - Save the authentication token in a config.ini file with the contents:
+        ```
+        [KEY]
+        AUTH_TOKEN = "your-auth-token"
+        ```
 
 #### Required Libraries
 
 - requests
 - configparser
 - xlsxwriter
+- json
