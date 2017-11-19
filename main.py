@@ -175,6 +175,7 @@ def main():
         else:
             error_msg = handle_error(response.text)
             print(error_msg)
+            break
 
     # Close csv file
     close_xlsx(workbook)
